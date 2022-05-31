@@ -16,8 +16,8 @@
 
     var config = {
     type: Phaser.AUTO,
-    width: 4000,
-    height: 1000,
+    width: 3200,
+    height: 928,
     physics: {
         default: 'arcade',
         arcade: {
@@ -58,38 +58,61 @@ function preload ()
     // toute les images presente dasn le jeu 
     this.load.image('sky', 'assets/sky.png');
     this.load.image('ground', 'assets/platform.png');
-    this.load.image('bleu', 'assets/arbre_bleu.png');
     this.load.image('ground2', 'assets/platform2.png');
     this.load.image('groundVER', 'assets/platformVer.png');
     this.load.image('groundcarre', 'assets/platformcarre.png');
     this.load.image('sky2', 'assets/background 5.jpg');
 
-    this.load.image('fleche', 'assets/flecheverticale.png');
     this.load.image('beam', 'assets/fleche.png');
 
     this.load.spritesheet('dude', 'assets/Ximenia.png', { frameWidth: 166, frameHeight: 80 });
 
     this.load.image('bg', 'assets/tittleScreen.png');
+
+    // chargement tuiles de jeu
+    this.load.image("Phaser_tuilesdejeu", "assets/tuilesJeu.png");
+
+    // chargement de la carte
+    this.load.tilemapTiledJSON("carte", "assets/map.json");
 }
   
 function create ()
 {
     //  background
 
-    this.add.image(500, 224, 'sky2').setScale(2).refreshbody;
+    // chargement de la carte
+    const carteDuNiveau = this.add.tilemap("carte");
 
-    //  The platforms group contains the ground and the 2 ledges we can jump on
+    // chargement du jeu de tuiles
+    const tileset = carteDuNiveau.addTilesetImage(
+          "test tiled",
+          "Phaser_tuilesdejeu"
+        );
 
-    platforms = this.physics.add.staticGroup();
+    // chargement du calque calque_background
+    const backgroundLayer = carteDuNiveau.createStaticLayer(
+          "C1",
+          tileset
+        );
 
-    // sol de base doubler de volume 
+    // chargement du calque calque_background_2
+    const backgroundLayer2 = carteDuNiveau.createStaticLayer(
+          "C2",
+          tileset
+        );
 
-    platforms.create(400, 415, 'ground').setScale(2).refreshBody();
-    platforms.create(1200, 415, 'ground').setScale(2).refreshBody();
-    platforms.create(2000, 415, 'ground').setScale(2).refreshBody();
-    platforms.create(2800, 415, 'ground').setScale(2).refreshBody();
-    platforms.create(3600, 415, 'ground').setScale(2).refreshBody();
-    platforms.create(600, 300, 'ground');
+    // chargement du calque calque_plateformes
+    const plateformes = carteDuNiveau.createStaticLayer(
+          "C3",
+          tileset
+        );  
+
+    // définition des tuiles de plateformes qui sont solides
+    // utilisation de la propriété estSolide
+    plateformes.setCollisionByProperty({ estSolide: true });
+
+    // ajout d'une collision entre le joueur et le calque plateformes
+    this.physics.add.collider(player, plateformes);
 
     // perso and ses settings
 
@@ -137,13 +160,11 @@ function create ()
     
     //  Tout les Collider
 
-    this.physics.add.collider(player, platforms);
-
     this.physics.add.collider(groupeBullets,platforms);
 
     // Camera 
 
-    this.cameras.main.setBounds(0, 0, 4000, 418);
+    this.cameras.main.setBounds(0, 0, 3200, 928);
     this.cameras.main.setSize(896, 448);
     this.cameras.main.startFollow(player);
 
