@@ -1,240 +1,168 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
+<!doctype html>
+<html lang="en">
+
+<head>
     <meta charset="UTF-8" />
-    <title>FOREST-DANGER </title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <title>PlateformerMarioLike</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
     <style type="text/css">
         body {
             margin: 0;
         }
     </style>
 </head>
+
+
 <body>
+    <script type="text/javascript">
 
-<script type="text/javascript">
 
-    var config = {
-    type: Phaser.AUTO,
-    width: 3200,
-    height: 928,
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 350 },
-            debug: true
+        //Ecran d'acceuil
+
+        class EcranAcceuil extends Phaser.Scene {
+            constructor() {
+
+                super("EcranAcceuil")
+                this.cursors;
+            }
+
+            preload() {
+                this.load.image('ecranAcceuil', 'assets/tittleScreen.png')
+            }
+
+            create() {
+                this.ecranAccueil = this.physics.add.staticGroup();
+                this.ecranAccueil.create(400, 420, 'ecranAccueil').setScale(1.5)
+
+                this.cursors = this.input.keyboard.createCursorKeys();
+            }
+
+            //Changement de scène
+            update() {
+                if (this.cursors.space.isDown) {
+                    this.scene.start('Intro')
+                }
+            }
         }
-    },
-    scene: {
-            preload: preload,
-            create: create,
-            update: update
+
+        ////////////////////////////////////////INTRO////////////////////////////////////////
+        class Intro extends Phaser.Scene {
+            constructor() {
+                super("Intro");
+                this.player;
+                this.cursors;
+                this.gameOver = false;
+                this.cameras;
+                this.inventaire;
+
+            }
+
+            preload() {
+                this.load.spritesheet('player', 'assets/Hero.png',
+                    { frameWidth: 50, frameHeight: 50 });
+                this.load.image('assetsIntro', 'assets/tuileJeu2.png');
+                this.load.tilemapTiledJSON('intro', 'map.json');}
+
+            create() {
+
+                //Tiled
+                this.intro = this.add.tilemap('intro');
+                this.tileset = this.intro.addTilesetImage(
+                    "NivIntro",
+                    "assetsIntro"
+                );
+
+                this.ciel = this.intro.createLayer(
+                    "fond",
+                    this.tileset
+                )
+
+                this.arrierePlan = this.intro.createLayer(
+                    "obstacle",
+                    this.tileset
+                )
+
+                this.colliders.setCollisionByProperty({ estSolide: true });
+
+                //Colliders et autre
+                this.player = this.physics.add.sprite(74.9, 406.5, 'player').setScale(1.5).refreshBody();
+                this.player.body.setSize(20,27,true)
+                this.player.setOffset(8, 6);
+                this.player.setCollideWorldBounds(true);
+                this.physics.add.collider(this.player, this.colliders);
+                this.cursors = this.input.keyboard.createCursorKeys();
+
+                this.anims.create({
+                    key: 'walkRight',
+                    frames: this.anims.generateFrameNumbers('player', { start: 0, end: 7 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'walkLeft',
+                    frames: this.anims.generateFrameNumbers('player', { start: 8, end: 15 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+
+                //Camera
+                this.cameras.main.setBounds(0, 0, 1920, 3000);
+                this.cameras.main.setSize(800, 600);
+                this.cameras.main.startFollow(this.player);
+
+                //Touches
+                this.cursors = this.input.keyboard.createCursorKeys();
+                this.keys = this.input.keyboard.addKeys({
+                    z: Phaser.Input.Keyboard.KeyCodes.Z,
+
+                });
+            }
+
+            update() {
+
+                //Coordonnées
+                console.log(this.player.x, this.player.y)
+
+                if (this.cursors.right.isDown){
+                    this.player.direction == 'right';
+                }
+                if (this.cursors.left.isDown){
+                    this.player.direction == 'left';
+                }
+
+                //Déplacement et Changement de scène
+                if (this.cursors.left.isDown) {
+                    this.player.direction = 'left';
+                    this.player.setVelocityX(-100);
+                    this.player.anims.play('walkLeft', true);
+                }
+                else if (this.cursors.right.isDown) {
+                    this.player.direction = 'right';
+                    this.player.setVelocityX(1000);
+                    this.player.anims.play('walkRight', true);
+                };
+
+                //Changement de scène
+                if (this.player.x >= 1884 && this.player.y <= 406.5) {
+                    this.scene.start('Intro');
+                }
+            }
         }
-}
 
-// les variables presentes dans le code
+        var config = {
+            pixelArt: true,
+            type: Phaser.AUTO,
+            width: 3000, height: 900,
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 500 },
+                    debug: true
+                }
+            },
+            input: { gamepad: true },
+            scene: [EcranAcceuil, Intro]
+        };
+        new Phaser.Game(config);
 
-var player;
-var fleche;
-
-var platforms;
-var cursors;
-var text;
-var gameOver = false;
-var scoreText;
-var eau;
-var eau2;
-
-var camera;
-var boutonFeu;
-var direction;
-var bullet;
-var debut = true; 
-
-var game = new Phaser.Game(config);
-
-function preload ()
-{
-    // toute les images presente dasn le jeu 
-    this.load.image('sky', 'assets/sky.png');
-    this.load.image('ground', 'assets/platform.png');
-    this.load.image('ground2', 'assets/platform2.png');
-    this.load.image('groundVER', 'assets/platformVer.png');
-    this.load.image('groundcarre', 'assets/platformcarre.png');
-    this.load.image('sky2', 'assets/background 5.jpg');
-
-    this.load.image('beam', 'assets/fleche.png');
-
-    this.load.spritesheet('dude', 'assets/Ximenia.png', { frameWidth: 166, frameHeight: 80 });
-
-    this.load.image('bg', 'assets/tittleScreen.png');
-
-    // chargement tuiles de jeu
-    this.load.image("Phaser_tuilesdejeu", "assets/tuilesJeu.png");
-
-    // chargement de la carte
-    this.load.tilemapTiledJSON("carte", "assets/map.json");
-}
-  
-function create ()
-{
-    //  background
-
-    HEAD
-    // chargement de la carte
-    const carteDuNiveau = this.add.tilemap("carte");
-    
-    // chargement du jeu de tuiles
-    const tileset = carteDuNiveau.addTilesetImage(
-          "test tiled",
-          "Phaser_tuilesdejeu"
-        );
-
-    // chargement du calque calque_background
-    const backgroundLayer = carteDuNiveau.createStaticLayer(
-          "C1",
-          tileset
-        );
-
-    // chargement du calque calque_background_2
-    const backgroundLayer2 = carteDuNiveau.createStaticLayer(
-          "C2",
-          tileset
-        );
-
-    // chargement du calque calque_plateformes
-    const plateformes = carteDuNiveau.createStaticLayer(
-          "C3",
-          tileset
-        );  
-
-    // définition des tuiles de plateformes qui sont solides
-    // utilisation de la propriété estSolide
-    plateformes.setCollisionByProperty({ estSolide: true });
-
-    // ajout d'une collision entre le joueur et le calque plateformes
-    this.physics.add.collider(player, plateformes);
-
-    // perso and ses settings
-
-    player = this.physics.add.sprite(50, 50, 'dude');
-    player.setCollideWorldBounds(true);
-    var direction = 'right';
-    player.body.setSize(80,60);
-
-    //  animation du personnage a aller a droite ou a gauche. 
-
-    this.anims.create({
-        key: 'left',
-        frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 15 }),
-        frameRate: 20,
-        repeat: -1
-    });
-
-    this.anims.create({
-        key: 'turn',
-        frames: [ { key: 'dude', frame: 18 } ],
-        frameRate: 20
-    });
-
-    this.anims.create({
-        key: 'right',
-        frames: this.anims.generateFrameNumbers('dude', { start: 16, end: 29 }),
-        frameRate: 20,
-        repeat: -1
-    });
-
-     //  Input Events
-
-     cursors = this.input.keyboard.addKeys({ 
-            'up': Phaser.Input.Keyboard.KeyCodes.UP, 
-            'left': Phaser.Input.Keyboard.KeyCodes.LEFT,
-            'right': Phaser.Input.Keyboard.KeyCodes.RIGHT,
-            'space' : Phaser.Input.Keyboard.KeyCodes.SPACE,
-            'buttonX' : Phaser.Input.Keyboard.KeyCodes.X,
-        });
-
-    // bouton Feu 
-
-    boutonFeu = this.input.keyboard.addKey('space');
-    groupeBullets= this.physics.add.group();
-    
-    //  Tout les Collider
-
-    this.physics.add.collider(groupeBullets,platforms);
-
-    // Camera 
-
-    this.cameras.main.setBounds(0, 0, 3200, 928);
-    this.cameras.main.setSize(896, 448);
-    this.cameras.main.startFollow(player);
-
-    //debut du jeu ecran titre
-
-this.bgtitre = this.add.image(0,0, 'bg').setOrigin(0,0);
-
-}
-
-// fonction permettant de faire apparaitre la fleche ainsi que sa vitesse 
-
-function tirer(player) {    
-    
-    var coefDir;
-	    if (player.direction == 'left') { coefDir = -1; } else { coefDir = 1 }
-        var bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 10, 'beam');
-        bullet.body.allowGravity =false;
-        bullet.setVelocity(1000 * coefDir, 0); // vitesse en x et en y 
-}
-
-// commande de clavier
-
-function update ()
-{
-    if ( debut == true){
-        if (cursors.buttonX.isDown)
-        {
-            debut = false;
-        this.bgtitre.setVisible(false);
-    }
-    }
-
-    if (debut == false) {
-
-    if (gameOver)
-    {
-        return;
-    }
-
-    if (cursors.left.isDown)
-    {   
-        player.direction = 'left';
-        player.setVelocityX(-160);
-        player.anims.play('left', true);
-    }
-
-    else if (cursors.right.isDown)
-    {
-        player.direction = 'right';
-        player.setVelocityX(160);
-        player.anims.play('right', true);
-    }
-    else
-    {
-        player.setVelocityX(0);
-        player.anims.play('turn');
-    }
-
-    if (cursors.up.isDown && player.body.touching.down)
-    {
-        player.setVelocityY(-330);
-    }
-
-    if ( Phaser.Input.Keyboard.JustDown(boutonFeu)) {
-    tirer(player, direction);
-    }
-}
-}
-
-</script>
-</body>
-</html>
+    </script>
