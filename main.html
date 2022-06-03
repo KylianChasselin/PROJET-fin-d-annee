@@ -49,6 +49,8 @@
                 super("Intro");
                 this.player;
                 this.Policier;
+                this.Policier2;
+                this.Policier3;
                 this.Moto;
                 this.Drone;
                 this.cursors;
@@ -65,8 +67,8 @@
                 this.load.image('Moto', 'ASSETS/moto police.png',
                     { frameWidth: 70, frameHeight: 70 });
                 this.load.image('Drone', 'ASSETS/drone.png',
-                    { frameWidth: 40, frameHeight: 50 });
-                this.load.image('assetsIntro', 'ASSETS/tuileJeu2.png');
+                    { frameWidth: 60, frameHeight: 40 });
+                this.load.image('assetsIntro', 'ASSETS/fond1.png');
                 this.load.tilemapTiledJSON('intro', 'ASSETS/map.json');
             }
 
@@ -75,7 +77,7 @@
                 //Tiled
                 this.intro = this.add.tilemap('intro');
                 this.tileset = this.intro.addTilesetImage(
-                    "tuileJeu2",
+                    "fond1",
                     "assetsIntro"
                 );
 
@@ -89,6 +91,11 @@
                     this.tileset
                 )
 
+                this.pique = this.intro.createLayer(
+                    "pique",
+                    this.tileset
+                )
+
                 this.obstacle.setCollisionByProperty({ estSolide: true });
 
                 //Colliders et autre
@@ -97,6 +104,7 @@
                 this.player.setOffset(8, 6);
                 this.player.setCollideWorldBounds(true);
                 this.physics.add.collider(this.player, this.obstacle);
+                this.physics.add.collider(this.player, this.pique);
                 this.cursors = this.input.keyboard.createCursorKeys();
 
                 this.anims.create({
@@ -131,10 +139,16 @@
                 this.Policier3.setCollideWorldBounds(true);
 
                 /// MOTO POLICE ///
-                this.Moto = this.physics.add.image(3300, 1200, 'Moto');
+                this.Moto = this.physics.add.image(3310, 1200, 'Moto');
                 this.physics.add.collider(this.Moto, this.obstacle);
                 this.physics.add.collider(this.Moto, this.player, this.death, null,this);
                 this.Moto.setCollideWorldBounds(true);
+
+                /// DRONE ///
+                this.Drone = this.physics.add.image(300, 1200, 'Drone');
+                this.physics.add.collider(this.Drone, this.obstacle);
+                this.physics.add.collider(this.Drone, this.player, this.death, null,this);
+                this.Drone.setCollideWorldBounds(true);
 
                 //Camera
                 this.cameras.main.setBounds(0, 0, 4800, 1440);
@@ -163,7 +177,7 @@
                     this.player.anims.play('walkRight', true);
                 }
                 if (Phaser.Input.Keyboard.JustDown(this.keys.z) && this.player.body.onFloor()) {
-                    this.player.setVelocityY(-350);
+                    this.player.setVelocityY(-360);
                 };
 
                 //Changement de scène
@@ -193,12 +207,21 @@
                 }
 
                 /// DEPLACEMENT MOTO POLICE ///
-                if (this.Moto.x <= 3310){
+                if (this.Moto.x <= 3330){
                 this.Moto.setVelocityX(200)
                 }
 
-                if (this.Moto.x >= 3645){
-                this.Moto.setVelocityX(-100)
+                if (this.Moto.x >= 3640){
+                this.Moto.setVelocityX(-200)
+                }
+
+                /// DEPLACEMENT DRONE ///
+                if (this.Drone.y <= 1400){
+                this.Drone.setVelocityY(200)
+                }
+
+                if (this.Drone.y >= 1000){
+                this.Drone.setVelocityY(-200)
                 }
             }
 
