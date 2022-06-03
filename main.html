@@ -26,13 +26,12 @@
             }
 
             preload() {
-                this.load.image('ecranAcceuil', 'assets/tittleScreen.png')
+                this.load.image('ecranAcceuil', 'ASSETS/tittleScreen.png')
             }
 
             create() {
                 this.ecranAccueil = this.physics.add.staticGroup();
-                this.ecranAccueil.create(400, 420, 'ecranAccueil').setScale(1.5)
-
+                this.ecranAccueil.create(400, 420, 'ecranAccueil')
                 this.cursors = this.input.keyboard.createCursorKeys();
             }
 
@@ -44,11 +43,14 @@
             }
         }
 
-        ////////////////////////////////////////INTRO////////////////////////////////////////
+        ////////////////////////////////////////NIVEAU 1////////////////////////////////////////
         class Intro extends Phaser.Scene {
             constructor() {
                 super("Intro");
                 this.player;
+                this.Policier;
+                this.Moto;
+                this.Drone;
                 this.cursors;
                 this.gameOver = false;
                 this.cameras;
@@ -58,6 +60,12 @@
             preload() {
                 this.load.spritesheet('player', 'ASSETS/Hero.png',
                     { frameWidth: 50, frameHeight: 50 });
+                this.load.image('Policier', 'ASSETS/policier.png',
+                    { frameWidth: 40, frameHeight: 50 });
+                this.load.image('Moto', 'ASSETS/moto police.png',
+                    { frameWidth: 70, frameHeight: 70 });
+                this.load.image('Drone', 'ASSETS/drone.png',
+                    { frameWidth: 40, frameHeight: 50 });
                 this.load.image('assetsIntro', 'ASSETS/tuileJeu2.png');
                 this.load.tilemapTiledJSON('intro', 'ASSETS/map.json');
             }
@@ -84,7 +92,7 @@
                 this.obstacle.setCollisionByProperty({ estSolide: true });
 
                 //Colliders et autre
-                this.player = this.physics.add.sprite(100, 100, 'player');
+                this.player = this.physics.add.sprite(50, 1200, 'player');
                 this.player.body.setSize(50,50,true)
                 this.player.setOffset(8, 6);
                 this.player.setCollideWorldBounds(true);
@@ -104,6 +112,30 @@
                     repeat: -1
                 });
 
+                /// POICIER 1 ///
+                this.Policier = this.physics.add.image(900, 1200, 'Policier');
+                this.physics.add.collider(this.Policier, this.obstacle);
+                this.physics.add.collider(this.Policier, this.player, this.death, null,this);
+                this.Policier.setCollideWorldBounds(true);
+
+                /// POLICIER 2 ///
+                this.Policier2 = this.physics.add.image(1600, 1200, 'Policier');
+                this.physics.add.collider(this.Policier2, this.obstacle);
+                this.physics.add.collider(this.Policier2, this.player, this.death, null,this);
+                this.Policier2.setCollideWorldBounds(true);
+
+                /// POLICIER 3 ///
+                this.Policier3 = this.physics.add.image(2159, 1200, 'Policier');
+                this.physics.add.collider(this.Policier3, this.obstacle);
+                this.physics.add.collider(this.Policier3, this.player, this.death, null,this);
+                this.Policier3.setCollideWorldBounds(true);
+
+                /// MOTO POLICE ///
+                this.Moto = this.physics.add.image(3300, 1200, 'Moto');
+                this.physics.add.collider(this.Moto, this.obstacle);
+                this.physics.add.collider(this.Moto, this.player, this.death, null,this);
+                this.Moto.setCollideWorldBounds(true);
+
                 //Camera
                 this.cameras.main.setBounds(0, 0, 4800, 1440);
                 this.cameras.main.setSize(896, 614);
@@ -121,34 +153,68 @@
                 //Coordonnées
                 console.log(this.player.x, this.player.y)
 
-                if (this.cursors.right.isDown){
-                    this.player.direction == 'right';
-                }
-                if (this.cursors.left.isDown){
-                    this.player.direction == 'left';
-                }
-
                 //Déplacement et Changement de scène
                 if (this.cursors.left.isDown) {
-                    this.player.direction = 'left';
                     this.player.setVelocityX(-200);
                     this.player.anims.play('walkLeft', true);
                 }
                 else if (this.cursors.right.isDown) {
-                    this.player.direction = 'right';
                     this.player.setVelocityX(200);
                     this.player.anims.play('walkRight', true);
-                
                 }
                 if (Phaser.Input.Keyboard.JustDown(this.keys.z) && this.player.body.onFloor()) {
-                    this.player.setVelocityY(-400);
+                    this.player.setVelocityY(-350);
                 };
 
                 //Changement de scène
                 if (this.player.x >= 4750 && this.player.y <= 1400) {
                     this.scene.start('Intro');
                 }
+
+                /// DEPLACEMENT POLICIER 1 ///
+                /// EN A PAS, EST FIXE ///
+
+                /// DEPLACEMENT POLICIER 2 ///
+                if (this.Policier2.x <= 1600){
+                this.Policier2.setVelocityX(100)
+                }
+
+                if (this.Policier2.x >= 1980){
+                this.Policier2.setVelocityX(-100)
+                }
+
+                /// DEPLACEMENT POLICIER 3 ///
+                if (this.Policier3.x <= 2160){
+                this.Policier3.setVelocityX(100)
+                }
+
+                if (this.Policier3.x >= 2350){
+                this.Policier3.setVelocityX(-100)
+                }
+
+                /// DEPLACEMENT MOTO POLICE ///
+                if (this.Moto.x <= 3310){
+                this.Moto.setVelocityX(200)
+                }
+
+                if (this.Moto.x >= 3645){
+                this.Moto.setVelocityX(-100)
+                }
             }
+
+            death() {
+                this.dead = true;
+                this.player.setVelocityY(0);
+                this.player.setVelocityX(0);
+                this.player.setTint(0xff0000);
+                this.time.addEvent({
+                    delay: 500,
+                    callback: () => {
+                        this.scene.start("Intro")
+                    },
+                    loop: false
+                })
+    }
         }
 
         var config = {
