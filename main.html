@@ -50,8 +50,10 @@
                 this.player;
                 this.Policier;
                 this.Policier2;
+                this.Policier25;
                 this.Policier3;
                 this.Moto;
+                this.Moto2;
                 this.Drone;
                 this.cursors;
                 this.gameOver = false;
@@ -100,7 +102,7 @@
                 this.pique.setCollisionByProperty({ Pique: true });
 
                 //Colliders et autre
-                this.player = this.physics.add.sprite(50, 1200, 'player');
+                this.player = this.physics.add.sprite(4400, 1200, 'player');
                 this.player.body.setSize(50,50,true)
                 this.player.setOffset(8, 6);
                 this.player.setCollideWorldBounds(true);
@@ -195,7 +197,7 @@
 
                 //Changement de scène
                 if (this.player.x >= 4750 && this.player.y <= 1400) {
-                    this.scene.start('EcranFin');
+                    this.scene.start('Victoire');
                 }
 
                 /// DEPLACEMENT POLICIER 1 ///
@@ -271,10 +273,9 @@
     }
         }
 
-        ///////////////////////////// NIVEAU 2 //////////////////////////////////
+        ///////////////////////////// MORT //////////////////////////////////
         class Mort extends Phaser.Scene {
             constructor() {
-
                 super("Mort")
                 this.cursors;
             }
@@ -287,6 +288,38 @@
                 this.Mort = this.physics.add.staticGroup();
                 this.Mort.create(448, 224, 'Mort')
                 this.cursors = this.input.keyboard.createCursorKeys();
+            }
+
+            //Changement de scène
+            update() {
+                if (this.cursors.space.isDown) {
+                    this.scene.start('EcranAcceuil')
+                }
+            }
+        }
+
+        ///////////////////////////// Victoire //////////////////////////////////
+        class Victoire extends Phaser.Scene {
+            constructor() {
+                super("Victoire")
+                this.cursors;
+            }
+
+            preload() {
+                this.load.image('Victoire', 'ASSETS/Victoire.png')
+            }
+
+            create() {
+                this.Victoire = this.physics.add.staticGroup();
+                this.Victoire.create(448, 224, 'Victoire')
+                this.cursors = this.input.keyboard.createCursorKeys();
+            }
+
+            //Changement de scène
+            update() {
+                if (this.cursors.space.isDown) {
+                    this.scene.start('EcranAcceuil')
+                }
             }
         }
         
@@ -302,7 +335,7 @@
                 }
             },
             input: { gamepad: true },
-            scene: [EcranAcceuil, Intro, Mort],
+            scene: [EcranAcceuil, Intro, Mort, Victoire],
         };
         new Phaser.Game(config);
 
