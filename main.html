@@ -195,7 +195,7 @@
 
                 //Changement de scène
                 if (this.player.x >= 4750 && this.player.y <= 1400) {
-                    this.scene.start('Intro');
+                    this.scene.start('EcranFin');
                 }
 
                 /// DEPLACEMENT POLICIER 1 ///
@@ -264,14 +264,30 @@
                 this.time.addEvent({
                     delay: 500,
                     callback: () => {
-                        this.scene.start("EcranFin")
+                        this.scene.start("Mort")
                     },
                     loop: false
                 })
-            
-        ///////////////////////////// NIVEAU 2 //////////////////////////////////
-        
     }
+        }
+
+        ///////////////////////////// NIVEAU 2 //////////////////////////////////
+        class Mort extends Phaser.Scene {
+            constructor() {
+
+                super("Mort")
+                this.cursors;
+            }
+
+            preload() {
+                this.load.image('Mort', 'ASSETS/ecran mort.png')
+            }
+
+            create() {
+                this.Mort = this.physics.add.staticGroup();
+                this.Mort.create(448, 224, 'Mort')
+                this.cursors = this.input.keyboard.createCursorKeys();
+            }
         }
         
         var config = {
@@ -286,7 +302,7 @@
                 }
             },
             input: { gamepad: true },
-            scene: [EcranAcceuil, Intro]
+            scene: [EcranAcceuil, Intro, Mort],
         };
         new Phaser.Game(config);
 
