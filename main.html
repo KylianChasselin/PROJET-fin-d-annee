@@ -16,7 +16,7 @@
     <script type="text/javascript">
 
 
-        //Ecran d'acceuil
+        ////////////// ECRAN D'ACCEUIL //////////////////
 
         class EcranAcceuil extends Phaser.Scene {
             constructor() {
@@ -26,12 +26,12 @@
             }
 
             preload() {
-                this.load.image('ecranAcceuil', 'ASSETS/tittleScreen.png')
+                this.load.image('ecranAccueil', 'ASSETS/ecranAcceuil.png')
             }
 
             create() {
                 this.ecranAccueil = this.physics.add.staticGroup();
-                this.ecranAccueil.create(400, 420, 'ecranAccueil')
+                this.ecranAccueil.create(448, 224, 'ecranAccueil')
                 this.cursors = this.input.keyboard.createCursorKeys();
             }
 
@@ -43,7 +43,7 @@
             }
         }
 
-        ////////////////////////////////////////NIVEAU 1////////////////////////////////////////
+        //////////////////////////////////////// NIVEAU 1 ////////////////////////////////////////
         class Intro extends Phaser.Scene {
             constructor() {
                 super("Intro");
@@ -165,7 +165,7 @@
 
                 //Camera
                 this.cameras.main.setBounds(0, 0, 4800, 1440);
-                this.cameras.main.setSize(896, 614);
+                this.cameras.main.setSize(896, 448);
                 this.cameras.main.startFollow(this.player);
 
                 //Touches
@@ -264,12 +264,12 @@
                 this.time.addEvent({
                     delay: 500,
                     callback: () => {
-                        this.scene.start("Intro")
+                        this.scene.start("EcranFin")
                     },
                     loop: false
                 })
-
-            ///////////////////////////// NIVEAU 2 //////////////////////////////////
+            
+        ///////////////////////////// NIVEAU 2 //////////////////////////////////
         
     }
         }
