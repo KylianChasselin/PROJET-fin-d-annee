@@ -102,7 +102,7 @@
                 this.pique.setCollisionByProperty({ Pique: true });
 
                 //Colliders et autre
-                this.player = this.physics.add.sprite(4400, 1200, 'player');
+                this.player = this.physics.add.sprite(50, 1200, 'player');
                 this.player.body.setSize(50,50,true)
                 this.player.setOffset(8, 6);
                 this.player.setCollideWorldBounds(true);
@@ -281,7 +281,7 @@
             }
 
             preload() {
-                this.load.image('Mort', 'ASSETS/ecran mort.png')
+                this.load.image('Mort', 'ASSETS/ecranMort.png')
             }
 
             create() {
@@ -331,7 +331,7 @@
                 default: 'arcade',
                 arcade: {
                     gravity: { y: 500 },
-                    debug: true
+                    debug: false
                 }
             },
             input: { gamepad: true },
