@@ -197,6 +197,242 @@
 
                 //Changement de scène
                 if (this.player.x >= 4750 && this.player.y <= 1400) {
+                    this.scene.start('Niv2');
+                }
+
+                /// DEPLACEMENT POLICIER 1 ///
+                /// EN A PAS, EST FIXE ///
+
+                /// DEPLACEMENT POLICIER 2 ///
+                if (this.Policier2.x <= 1600){
+                this.Policier2.setVelocityX(100)
+                }
+
+                if (this.Policier2.x >= 1980){
+                this.Policier2.setVelocityX(-100)
+                }
+
+                /// DEPLACEMENT POLICIER 2.5 ///
+                if (this.Policier25.x <= 1600){
+                this.Policier25.setVelocityX(100)
+                }
+
+                if (this.Policier25.x >= 1980){
+                this.Policier25.setVelocityX(-100)
+                }
+
+                /// DEPLACEMENT POLICIER 3 ///
+                if (this.Policier3.x <= 2200){
+                this.Policier3.setVelocityX(100)
+                }
+
+                if (this.Policier3.x >= 2390){
+                this.Policier3.setVelocityX(-100)
+                }
+
+                /// DEPLACEMENT MOTO POLICE ///
+                if (this.Moto.x <= 3340){
+                this.Moto.setVelocityX(250)
+                }
+
+                if (this.Moto.x >= 3900){
+                this.Moto.setVelocityX(-250)
+                }
+
+                /// DEPLACEMENT MOTO POLICE 2 ///
+                if (this.Moto2.x <= 3340){
+                this.Moto2.setVelocityX(250)
+                }
+
+                if (this.Moto2.x >= 3900){
+                this.Moto2.setVelocityX(-250)
+                }
+
+                /// DEPLACEMENT DRONE ///
+                if (this.Drone.y <= 200){
+                this.Drone.setVelocityY(200)
+                }
+
+                if (this.Drone.y >= 510){
+                this.Drone.setVelocityY(-100)
+                }
+            }
+
+            death() {
+                this.dead = true;
+                this.player.setVelocityY(0);
+                this.player.setVelocityX(0);
+                this.player.setTint(0xff0000);
+                this.time.addEvent({
+                    delay: 500,
+                    callback: () => {
+                        this.scene.start("Intro")
+                    },
+                    loop: false
+                })
+    }
+        }
+
+        ///////////////////////////// NIV 2 //////////////////////////////////
+
+        class Niv2 extends Phaser.Scene {
+            constructor() {
+                super("Niv2");
+                this.player;
+                this.Policier;
+                this.Policier2;
+                this.Policier25;
+                this.Policier3;
+                this.Moto;
+                this.Moto2;
+                this.Drone;
+                this.cursors;
+                this.gameOver = false;
+                this.cameras;
+                this.inventaire;
+            }
+
+            preload() {
+                this.load.spritesheet('player', 'ASSETS/Hero.png',
+                    { frameWidth: 50, frameHeight: 50 });
+                this.load.image('Policier', 'ASSETS/policier.png',
+                    { frameWidth: 40, frameHeight: 50 });
+                this.load.image('Moto', 'ASSETS/moto police.png',
+                    { frameWidth: 70, frameHeight: 70 });
+                this.load.image('Drone', 'ASSETS/drone.png',
+                    { frameWidth: 60, frameHeight: 40 });
+                this.load.image('assetsNiv2', 'ASSETS/fond2.png');
+                this.load.tilemapTiledJSON('Niv2', 'ASSETS/map2.json');
+            }
+
+            create() {
+
+                //Tiled
+                this.Niv2 = this.add.tilemap('Niv2');
+                this.tileset = this.Niv2.addTilesetImage(
+                    "fond2",
+                    "assetsNiv2"
+                );
+
+                this.fond = this.Niv2.createLayer(
+                    "fond",
+                    this.tileset
+                )
+
+                this.batiment = this.Niv2.createLayer(
+                    "batiment",
+                    this.tileset
+                )
+
+                this.obstacle = this.Niv2.createLayer(
+                    "obstacle",
+                    this.tileset
+                )
+
+                this.pique = this.Niv2.createLayer(
+                    "pique",
+                    this.tileset
+                )
+
+                this.obstacle.setCollisionByProperty({ estSolide2: true });
+                this.pique.setCollisionByProperty({ pique2: true });
+
+                //Colliders et autre
+                this.player = this.physics.add.sprite(50, 1200, 'player');
+                this.player.body.setSize(50,50,true)
+                this.player.setOffset(8, 6);
+                this.player.setCollideWorldBounds(true);
+                this.physics.add.collider(this.player, this.obstacle);
+                this.physics.add.collider(this.player, this.pique, this.death, null, this);
+                this.cursors = this.input.keyboard.createCursorKeys();
+
+                this.anims.create({
+                    key: 'walkRight',
+                    frames: this.anims.generateFrameNumbers('player', { start: 0, end: 7 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'walkLeft',
+                    frames: this.anims.generateFrameNumbers('player', { start: 8, end: 15 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+
+                /// POICIER 1 ///
+                this.Policier = this.physics.add.image(900, 1200, 'Policier');
+                this.physics.add.collider(this.Policier, this.obstacle);
+                this.physics.add.collider(this.Policier, this.player, this.death, null,this);
+                this.Policier.setCollideWorldBounds(true);
+
+                /// POLICIER 2 ///
+                this.Policier2 = this.physics.add.image(1600, 1200, 'Policier');
+                this.physics.add.collider(this.Policier2, this.obstacle);
+                this.physics.add.collider(this.Policier2, this.player, this.death, null,this);
+                this.Policier2.setCollideWorldBounds(true);
+
+                /// POLICIER 2.5 ///
+                this.Policier25 = this.physics.add.image(1980, 1200, 'Policier');
+                this.physics.add.collider(this.Policier25, this.obstacle);
+                this.physics.add.collider(this.Policier25, this.player, this.death, null,this);
+                this.Policier25.setCollideWorldBounds(true);
+
+                /// POLICIER 3 ///
+                this.Policier3 = this.physics.add.image(2160, 1200, 'Policier');
+                this.physics.add.collider(this.Policier3, this.obstacle);
+                this.physics.add.collider(this.Policier3, this.player, this.death, null,this);
+                this.Policier3.setCollideWorldBounds(true);
+
+                /// MOTO POLICE ///
+                this.Moto = this.physics.add.image(3310, 1200, 'Moto');
+                this.physics.add.collider(this.Moto, this.obstacle);
+                this.physics.add.collider(this.Moto, this.player, this.death, null,this);
+                this.Moto.setCollideWorldBounds(true);
+
+                /// MOTO POLICE 2 ///
+                this.Moto2 = this.physics.add.image(3900, 1200, 'Moto');
+                this.physics.add.collider(this.Moto2, this.obstacle);
+                this.physics.add.collider(this.Moto2, this.player, this.death, null,this);
+                this.Moto2.setCollideWorldBounds(true);
+
+                /// DRONE ///
+                this.Drone = this.physics.add.image(2000, 510, 'Drone');
+                this.physics.add.collider(this.Drone, this.obstacle);
+                this.physics.add.collider(this.Drone, this.player, this.death, null,this);
+                this.Drone.setCollideWorldBounds(true);
+
+                //Camera
+                this.cameras.main.setBounds(0, 0, 4800, 1440);
+                this.cameras.main.setSize(896, 448);
+                this.cameras.main.startFollow(this.player);
+
+                //Touches
+                this.cursors = this.input.keyboard.createCursorKeys();
+                this.keys = this.input.keyboard.addKeys({
+                    z: Phaser.Input.Keyboard.KeyCodes.Z,
+                });
+            }
+
+            update() {
+
+                //Coordonnées
+                console.log(this.player.x, this.player.y)
+
+                //Déplacement et Changement de scène
+                if (this.cursors.left.isDown) {
+                    this.player.setVelocityX(-200);
+                    this.player.anims.play('walkLeft', true);
+                }
+                else if (this.cursors.right.isDown) {
+                    this.player.setVelocityX(200);
+                    this.player.anims.play('walkRight', true);
+                }
+                if (Phaser.Input.Keyboard.JustDown(this.keys.z) && this.player.body.onFloor()) {
+                    this.player.setVelocityY(-360);
+                };
+
+                //Changement de scène
+                if (this.player.x >= 4750 && this.player.y <= 1400) {
                     this.scene.start('Victoire');
                 }
 
@@ -266,7 +502,7 @@
                 this.time.addEvent({
                     delay: 500,
                     callback: () => {
-                        this.scene.start("Mort")
+                        this.scene.start("Niv2")
                     },
                     loop: false
                 })
@@ -335,7 +571,7 @@
                 }
             },
             input: { gamepad: true },
-            scene: [EcranAcceuil, Intro, Mort, Victoire],
+            scene: [EcranAcceuil, Intro, Niv2, Mort, Victoire],
         };
         new Phaser.Game(config);
 
